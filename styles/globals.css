@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #fdf7f0;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  color: #2d2a32;
+}
+
+a {
+  color: inherit;
+}
+
+.card {
+  @apply bg-white/80 rounded-xl shadow-md p-6 border border-kraft/40;
+}
+
+.btn-primary {
+  @apply bg-kraft text-slate-900 font-semibold rounded-full px-6 py-3 shadow hover:-translate-y-0.5 transition transform;
+}
+
+.btn-secondary {
+  @apply bg-sage text-white font-semibold rounded-full px-6 py-3 shadow hover:-translate-y-0.5 transition transform;
+}
+
+.input {
+  @apply w-full border border-kraft/70 rounded-lg px-4 py-2 bg-white/70 focus:outline-none focus:ring-2 focus:ring-sage;
+}
