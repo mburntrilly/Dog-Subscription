@@ -1,0 +1,105 @@
+// Prisma schema for Good Dog Mail Club
+// PostgreSQL is recommended; adjust the DATABASE_URL in .env
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  VISITOR
+  MEMBER
+  ADMIN
+}
+
+enum Plan {
+  GOOD_DOG_9_99
+  BEST_DOG_14_99
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+enum FunFeatureType {
+  HOROSCOPE
+  BADGE
+  STORY
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  role          Role     @default(VISITOR)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  dogs          Dog[]
+  subscription  Subscription?
+  addressLine1  String?
+  city          String?
+  state         String?
+  postalCode    String?
+}
+
+model Dog {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  name      String
+  birthMonth Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  completions AdventureCompletion[]
+}
+
+model Subscription {
+  id                  String               @id @default(uuid())
+  user                User                 @relation(fields: [userId], references: [id])
+  userId              String               @unique
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  plan                Plan
+  status              SubscriptionStatus
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model MonthlyAdventure {
+  id                  String   @id @default(uuid())
+  monthKey            String   @unique
+  title               String
+  themeDescription    String
+  messageToDogTemplate String
+  missionTitle        String
+  missionSteps        Json
+  funFeatureType      FunFeatureType
+  funFeatureContent   Json
+  isActive            Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  completions         AdventureCompletion[]
+}
+
+model AdventureCompletion {
+  id                 String   @id @default(uuid())
+  dog                Dog      @relation(fields: [dogId], references: [id])
+  dogId              String
+  monthlyAdventure   MonthlyAdventure @relation(fields: [monthlyAdventureId], references: [id])
+  monthlyAdventureId String
+  stepsCompleted     Json
+  isComplete         Boolean  @default(false)
+  completedAt        DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([dogId, monthlyAdventureId])
+}
